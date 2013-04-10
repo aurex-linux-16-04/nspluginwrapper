@@ -1,0 +1,22 @@
+Index: multiarch/src/npw-viewer.sh
+===================================================================
+--- multiarch.orig/src/npw-viewer.sh
++++ multiarch/src/npw-viewer.sh
+@@ -58,7 +58,7 @@
+ 	    # otherwise (use QEMU?)
+ 	    LOADER="none"
+ 	else
+-	    LOADER=`which qemu-i386`
++	    LOADER=`which qemu-i386-static`
+ 	    # Don't allow Xshm with qemu
+ 	    NPW_USE_XSHM="no"
+ 	fi
+@@ -71,7 +71,7 @@
+ 	        ;;
+ 	    esac
+ 	else
+-	    LOADER=`which qemu-ppc`
++	    LOADER=`which qemu-ppc-static`
+ 	    # Don't allow Xshm with qemu
+ 	    NPW_USE_XSHM="no"
+ 	fi

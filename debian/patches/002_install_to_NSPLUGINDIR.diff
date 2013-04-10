@@ -1,0 +1,32 @@
+Allow plugins to be installed to a directory specified by environment
+variable NSPLUGIN_DIR.
+
+Patch from Alexander Sack.
+
+ -- Rob Andrews <rob@choralone.org>  Sat, 14 Jul 2007 18:45:00 +0100
+
+Index: nspluginwrapper-1.4.2/src/npw-config.c
+===================================================================
+--- nspluginwrapper-1.4.2.orig/src/npw-config.c	2011-06-22 22:58:34.668425204 -0400
++++ nspluginwrapper-1.4.2/src/npw-config.c	2011-06-22 22:58:34.688425204 -0400
+@@ -137,6 +137,10 @@
+   static const char default_dir[] = LIBDIR "/mozilla/plugins";
+   static const char *dir = NULL;
+ 
++  char *plugin_dir = getenv("NSPLUGIN_DIR");
++  if(plugin_dir)
++	return plugin_dir;
++
+   if (dir == NULL) {
+ 	const char **dirs = NULL;
+ 
+@@ -747,7 +751,8 @@
+   /* Install symlinks on Debian systems */
+   if (has_system_wide_wrapper_plugin(plugin_path, true)
+ 	  && (access("/etc/debian_version", F_OK) == 0)
+-	  && (g_dosymlink == true))
++	  && (g_dosymlink == true)
++	  && (getenv("NSPLUGIN_DIR") == NULL))
+   {
+ 	  static const char *ldir = NULL;
+ 	  const char **ldirs = NULL;

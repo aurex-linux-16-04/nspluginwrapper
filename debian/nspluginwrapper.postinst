@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+        configure)
+		NSPLUGIN_DIRS=
+		for i in `ls /usr/lib/nspluginwrapper/dirs.d/* 2>/dev/null`; do
+			for j in `cat $i`; do
+				NSPLUGIN_DIRS=$NSPLUGIN_DIRS:$j
+			done
+		done
+		echo plugin dirs: $NSPLUGIN_DIRS
+		export NSPLUGIN_DIRS
+		if test -x /usr/bin/nspluginwrapper; then
+			# flashplugin-nonfree is installed in a non-standard location.
+			# When nspluginwrapper tries to refresh all the wrapped
+			# plugins, it will misdetect flash and break it. This
+			# will refresh flashplugin-nonfree first, causing it to
+			# get ignored during the standard plugin refresh.
+		  	if test -f /usr/lib/flashplugin-installer/libflashplayer.so; then
+				NSPLUGIN_DIR=/var/lib/flashplugin-installer/ /usr/bin/nspluginwrapper -n -i /usr/lib/flashplugin-installer/libflashplayer.so || true
+			fi
+
+			# Now, refresh all the other plugins
+			nspluginwrapper -a -v -u || true
+		fi
+        ;;
+
+        abort-upgrade|abort-remove|abort-deconfigure)
+                echo "postinst called with argument \`$1'" >&2
+                exit 1
+        ;;
+
+        *)
+                echo "postinst called with unknown argument \`$1'" >&2
+                exit 1
+        ;;
+esac
+
+
+exit 0

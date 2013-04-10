@@ -1,0 +1,59 @@
+Description: Link with gthread-2.0 when using g_thread_init per GLIB API docs
+Author: Micah Gersten <micahg@ubuntu.com>
+Fowarded: https://github.com/davidben/nspluginwrapper/issues/44
+
+---
+ Makefile  |    5 +++--
+ configure |    2 ++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+Index: nspluginwrapper-1.4.4/configure
+===================================================================
+--- nspluginwrapper-1.4.4.orig/configure
++++ nspluginwrapper-1.4.4/configure
+@@ -501,6 +501,7 @@
+ if $pkgconfig --exists glib-2.0; then
+     GLIB_CFLAGS=`$pkgconfig --cflags glib-2.0`
+     GLIB_LIBS=`$pkgconfig --libs glib-2.0`
++    GTHREAD_LIBS=`$pkgconfig --libs gthread-2.0`
+     GLIB_VERSION=`$pkgconfig --modversion glib-2.0`
+ else
+     echo "GLIB 2.0 environment not found"
+@@ -762,6 +763,7 @@
+ echo "LDFLAGS=$LDFLAGS" >> $config_mak
+ echo "GLIB_CFLAGS=$GLIB_CFLAGS" >> $config_mak
+ echo "GLIB_LIBS=$GLIB_LIBS" >> $config_mak
++echo "GTHREAD_LIBS=$GTHREAD_LIBS" >> $config_mak
+ echo "GTK_CFLAGS=$GTK_CFLAGS" >> $config_mak
+ echo "GTK_LIBS=$GTK_LIBS" >> $config_mak
+ echo "CURL_CFLAGS=$CURL_CFLAGS" >> $config_mak
+Index: nspluginwrapper-1.4.4/Makefile
+===================================================================
+--- nspluginwrapper-1.4.4.orig/Makefile
++++ nspluginwrapper-1.4.4/Makefile
+@@ -89,6 +89,7 @@
+ GLIB_CFLAGS_32 = $(GLIB_CFLAGS)
+ GLIB_LIBS_32   = $(GLIB_LIBS)
+ GTK_CFLAGS_32  = $(GTK_CFLAGS)
++GTHREAD_LIBS_32 = $(GTHREAD_LIBS)
+ GTK_LIBS_32    = $(GTK_LIBS)
+ X_CFLAGS_32    = $(X_CFLAGS)
+ X_LIBS_32      = $(X_LIBS)
+@@ -116,7 +117,7 @@
+ npviewer_CFLAGS  += $(MOZILLA_CFLAGS)
+ npviewer_LDFLAGS  = $(LDFLAGS_32)
+ npviewer_LDFLAGS += $(libpthread_LDFLAGS)
+-npviewer_LIBS     = $(GTK_LIBS_32) $(GLIB_LIBS_32) $(X_LIBS_32)
++npviewer_LIBS     = $(GTK_LIBS_32) $(GTHREAD_LIBS_32) $(GLIB_LIBS_32) $(X_LIBS_32)
+ npviewer_LIBS    += $(libdl_LIBS) $(libpthread_LIBS)
+ ifeq ($(TARGET_OS):$(TARGET_ARCH),linux:i386)
+ npviewer_MAPFILE  = $(SRC_PATH)/src/npw-viewer.map
+@@ -141,7 +142,7 @@
+ npplayer_CFLAGS  += $(GTK_CFLAGS) $(GLIB_CFLAGS) $(MOZILLA_CFLAGS) $(CURL_CFLAGS) $(X_CFLAGS)
+ npplayer_LDFLAGS  = $(LDFLAGS)
+ npplayer_LDFLAGS += $(libpthread_LDFLAGS)
+-npplayer_LIBS     = $(GTK_LIBS) $(GLIB_LIBS) $(CURL_LIBS) $(X_LIBS)
++npplayer_LIBS     = $(GTK_LIBS) $(GTHREAD_LIBS) $(GLIB_LIBS) $(CURL_LIBS) $(X_LIBS)
+ npplayer_LIBS    += $(libpthread_LIBS) $(libsocket_LIBS)
+ 
+ libnoxshm_LIBRARY = libnoxshm.so

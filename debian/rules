@@ -1,0 +1,100 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# debian/rules that uses debhelper.
+
+# Uncomment this to turn on verbose mode.
+# export DH_VERBOSE=1
+
+# quilty comfort
+include /usr/share/quilt/quilt.make
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_HOST_GNU_CPU    ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+DEB_HOST_ARCH_CPU   ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+
+# Report all warnings, generate debugging symbols (don't worry, we dh_strip)
+CFLAGS = -Wall -g
+
+# Conditional optimmisation
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+  ifeq ($(DEB_HOST_GNU_CPU),arm)
+	CFLAGS += -O0
+  else
+	CFLAGS += -O2
+  endif
+endif
+
+CONFIG_FLAGS = \
+	--prefix=/usr \
+	--disable-biarch \
+	$(NULL)
+
+ifneq (,$(findstring x86_64,$(DEB_HOST_GNU_TYPE)))
+CONFIG_FLAGS += \
+		--with-lib32=lib32 \
+		--with-lib64=lib \
+		$(NULL)
+endif
+
+ifeq ($(DEB_HOST_ARCH_CPU),i386)
+	CONFIG_FLAGS += --enable-viewer
+endif
+
+configure: patch configure-stamp
+configure-stamp:
+	dh_testdir
+	CFLAGS="$(CFLAGS)" ./configure $(CONFIG_FLAGS)
+	touch $@
+
+build: configure build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE)
+	touch $@
+
+clean: clean-patched unpatch
+clean-patched:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	[ ! -f Makefile ] || $(MAKE) distclean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_install
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installman debian/nspluginwrapper.1 debian/nspluginplayer.1
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

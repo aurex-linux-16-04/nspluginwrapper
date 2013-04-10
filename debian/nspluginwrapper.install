@@ -1,0 +1,5 @@
+/usr/lib/nspluginwrapper/*/linux/npwrapper.so
+/usr/lib/nspluginwrapper/*/linux/npplayer
+/usr/lib/nspluginwrapper/*/linux/npconfig
+/usr/bin/nspluginwrapper
+/usr/bin/nspluginplayer

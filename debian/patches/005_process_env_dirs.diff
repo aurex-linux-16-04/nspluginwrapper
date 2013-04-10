@@ -1,0 +1,57 @@
+Implement get_env_plugin_dirs() to return a list of directory names
+specified by environment variable NSPLUGIN_DIRS.
+Adjust get_mozilla_plugin_dirs() to append the mentioned list at the end.
+Adjust npconfig_CFLAGS in Makefile to include glib during compile.
+
+ -- Sasa Bodiroza <jazzva@gmail.com>  Wed, 01 Apr 2009 21:50:00 +0200
+Index: nspluginwrapper-1.4.2/src/npw-config.c
+===================================================================
+--- nspluginwrapper-1.4.2.orig/src/npw-config.c	2011-06-22 22:59:23.708425192 -0400
++++ nspluginwrapper-1.4.2/src/npw-config.c	2011-06-22 22:59:23.728425192 -0400
+@@ -228,6 +228,21 @@
+   return (plugin_path = g_build_filename(home, ".mozilla", "plugins", NULL));
+ }
+ 
++const gchar **get_env_plugin_dirs(int *count)
++{
++  char *ns_plugin_dir = getenv("NSPLUGIN_DIRS");
++  if (ns_plugin_dir == NULL)
++    return NULL;
++  *count = 0;
++  const gchar **ns_plugin_dirs = g_strsplit((gchar *)ns_plugin_dir, ":", -1);
++  const gchar **iter = ns_plugin_dirs;
++  while (*iter) {
++    (*count)++;
++    iter++;
++  }
++  return ns_plugin_dirs;
++}
++
+ static const char **get_mozilla_plugin_dirs(void)
+ {
+   static const char *default_dirs[] = {
+@@ -272,13 +287,23 @@
+   };
+ 
+   const int n_default_dirs = (sizeof(default_dirs) / sizeof(default_dirs[0]));
+-  const char **dirs = malloc((n_default_dirs + 2) * sizeof(dirs[0]));
++  int n_env_dirs;
++  const gchar **env_dirs = get_env_plugin_dirs(&n_env_dirs);
++  const char **dirs = malloc((n_default_dirs + n_env_dirs + 2) * sizeof(dirs[0]));
+   int i, j;
+   for (i = 0, j = 0; i < n_default_dirs; i++) {
+ 	const char *dir = default_dirs[i];
+ 	if (dir && access(dir, F_OK) == 0)
+ 	  dirs[j++] = dir;
+   }
++  if (env_dirs) {
++    const gchar **iter = env_dirs;
++    while (*iter) {
++	  if (*iter && access(*iter, F_OK) == 0)
++	    dirs[j++] = (char *)*iter;
++        iter++;
++    }
++  }
+   dirs[j++] = get_user_mozilla_plugin_dir();
+   dirs[j] = NULL;
+   return dirs;

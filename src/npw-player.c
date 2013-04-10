@@ -24,8 +24,6 @@
 #include <dlfcn.h>
 #include <unistd.h>
 #include <glib.h>
-#include <glib/gstdio.h>
-#include <glib/gthread.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>

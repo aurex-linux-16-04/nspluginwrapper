@@ -1,0 +1,8 @@
+000_debian_make_symlinks.diff
+002_install_to_NSPLUGINDIR.diff
+005_process_env_dirs.diff
+006_flash_csw_workaround.diff
+right-qemu-path
+link_with_gthread_2.0.patch
+libdl_underlinkage.patch
+implicit_decl.patch

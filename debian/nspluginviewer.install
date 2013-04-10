@@ -1,0 +1,4 @@
+/usr/lib/nspluginwrapper/*/linux/npviewer
+/usr/lib/nspluginwrapper/*/linux/npviewer.bin
+/usr/lib/nspluginwrapper/*/linux/libnoxshm.so
+/usr/lib/nspluginwrapper/noarch/npviewer.sh

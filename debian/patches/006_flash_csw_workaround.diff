@@ -1,0 +1,16 @@
+Index: nspluginwrapper-1.4.2/Makefile
+===================================================================
+--- nspluginwrapper-1.4.2.orig/Makefile	2011-06-22 23:04:25.000000000 -0400
++++ nspluginwrapper-1.4.2/Makefile	2011-06-22 23:06:20.578425086 -0400
+@@ -265,6 +265,11 @@
+ 	echo "#!/bin/sh" > $$p;								\
+ 	echo "TARGET_OS=$(TARGET_OS)" >> $$p;						\
+ 	echo "TARGET_ARCH=$(TARGET_ARCH)" >> $$p;					\
++	echo 'case "$$*" in' >> $$p; 							\
++	echo "*libflashplayer*)" >> $$p; 						\
++	echo "	export GDK_NATIVE_WINDOWS=1" >> $$p; 					\
++	echo "	;;" >> $$p; 								\
++	echo "esac" >> $$p; 								\
+ 	echo ". $(npcommondir)/$(nploader_PROGRAM)" >> $$p;			\
+ 	chmod 755 $$p
+ do.install.libnoxshm: install.dirs $(libnoxshm_LIBRARY)
